@@ -2,7 +2,7 @@
 
 ## 仓库与运行
 
-- **Git 仓库地址**：待填写（远程仓库地址尚未提供）
+- **Git 仓库地址**：https://github.com/SYSUCY/svg-editor-cli
 - 验证环境：Windows、Node.js 22.22.2、npm 10.9.7
 - 主要技术：TypeScript 严格模式、面向对象模型、Vitest、fast-xml-parser
 

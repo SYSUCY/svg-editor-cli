@@ -1,5 +1,6 @@
 node_modules/
 dist/
 coverage/
+.workbuddy/
 *.log
 .DS_Store

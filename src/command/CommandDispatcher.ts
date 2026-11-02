@@ -1,4 +1,4 @@
-import { CommandLineTokenizer } from '../cli/CommandLineTokenizer.js';
+import { CommandLineTokenizer } from './CommandLineTokenizer.js';
 import type { CommandContext } from './CommandContext.js';
 import type { Command } from './Command.js';
 import { AddToCommand } from './commands/AddToCommand.js';

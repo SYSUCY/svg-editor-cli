@@ -1,0 +1,59 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam monochrome true
+title SVG Editor CLI - Component Diagram
+
+package "cli" {
+  [Main\nREPL] as CLI
+}
+
+package "app" {
+  [EditorSession] as Session
+}
+
+package "command" {
+  [CommandDispatcher] as Dispatcher
+  [CommandLineTokenizer] as Tokenizer
+  [Command classes] as Commands
+  [EditCommand] as EditCommand
+  [HistoryManager] as History
+}
+
+package "model" {
+  [SvgDocument] as Document
+  [Shape hierarchy] as Shapes
+  [Group\nComposite] as Group
+  [ShapeFactory] as Factory
+}
+
+package "io" {
+  [SvgFileStore] as Store
+  [SvgParser] as Parser
+  [SvgSerializer] as Serializer
+}
+
+package "display" {
+  [TreeFormatter] as Tree
+  [ShowFormatter] as Show
+}
+
+CLI --> Dispatcher
+CLI --> Session
+Dispatcher --> Tokenizer
+Dispatcher --> Commands
+Commands --> Session : CommandContext
+Commands --> Document
+Commands --> Tree
+Commands --> Show
+EditCommand --> History : history entries
+History --> Document : restore snapshots
+Session --> Store
+Session --> History
+Store --> Parser
+Store --> Serializer
+Parser --> Factory
+Serializer --> Document
+Document --> Shapes
+Group --|> Shapes
+Factory --> Shapes
+@enduml

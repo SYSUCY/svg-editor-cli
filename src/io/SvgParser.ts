@@ -1,5 +1,4 @@
 import { XMLParser, XMLValidator } from 'fast-xml-parser';
-import { Group } from '../model/Group.js';
 import type { ShapeData } from '../model/Shape.js';
 import { ShapeFactory } from '../model/ShapeFactory.js';
 import { SvgDocument } from '../model/SvgDocument.js';
@@ -19,6 +18,9 @@ export class SvgParser {
   private readonly counters = new Map<string, number>();
 
   public parse(xml: string, sourcePath?: string): SvgParseResult {
+    this.warnings.length = 0;
+    this.usedIds.clear();
+    this.counters.clear();
     if (/<!DOCTYPE/i.test(xml)) throw new Error('invalid SVG: DOCTYPE is not supported');
     const validation = XMLValidator.validate(xml);
     if (validation !== true) throw new Error(`invalid SVG: ${validation.err.msg}`);
@@ -38,6 +40,7 @@ export class SvgParser {
     const width = this.dimension(rootAttributes.width, 'width');
     const height = this.dimension(rootAttributes.height, 'height');
     const document = new SvgDocument(width, height, sourcePath);
+    this.collectExplicitIds(this.elementNodes(root.svg));
     for (const child of this.elementNodes(root.svg)) {
       const shape = this.parseShape(child);
       document.add(shape);
@@ -50,7 +53,6 @@ export class SvgParser {
     if (!ShapeFactory.supports(tag)) throw new Error(`unknown shape type: ${tag} (is the plugin loaded?)`);
     const attributes = { ...this.attributes(node) };
     const id = attributes.id ?? this.assignId(tag);
-    if (this.usedIds.has(id)) throw new Error(`id already exists: ${id}`);
     this.usedIds.add(id);
     attributes.id = id;
     const content = node[tag];
@@ -64,6 +66,18 @@ export class SvgParser {
     if (tag === 'text') data.text = this.text(content);
     if (tag === 'g') data.children = children;
     return ShapeFactory.fromData(data);
+  }
+
+  private collectExplicitIds(nodes: XmlNode[]): void {
+    for (const node of nodes) {
+      const id = this.attributes(node).id;
+      if (id !== undefined) {
+        if (this.usedIds.has(id)) throw new Error(`id already exists: ${id}`);
+        this.usedIds.add(id);
+      }
+      const tag = this.tag(node);
+      if (tag === 'g') this.collectExplicitIds(this.elementNodes(node[tag]));
+    }
   }
 
   private assignId(tag: string): string {

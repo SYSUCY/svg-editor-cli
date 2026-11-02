@@ -4,10 +4,7 @@ import { SvgParser, type SvgParseResult } from './SvgParser.js';
 import { SvgSerializer } from './SvgSerializer.js';
 
 export class SvgFileStore {
-  public constructor(
-    private readonly parser = new SvgParser(),
-    private readonly serializer = new SvgSerializer(),
-  ) {}
+  public constructor(private readonly serializer = new SvgSerializer()) {}
 
   public read(path: string): SvgParseResult {
     let xml: string;

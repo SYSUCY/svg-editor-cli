@@ -31,6 +31,13 @@ describe('SVG IO', () => {
     expect(restoredText.attributes['font-size']).toBe('16');
   });
 
+  it('avoids explicit ids that appear later when assigning automatic ids', () => {
+    const xml = '<svg width="10" height="10"><rect/><rect id="rect1"/></svg>';
+    const result = new SvgParser().parse(xml);
+    expect(result.warnings).toEqual(['warning: assigned id rect2 to unnamed <rect>']);
+    expect(result.document.elementCount).toBe(2);
+  });
+
   it('rejects duplicate ids during import', () => {
     const xml = '<svg width="10" height="10"><rect id="x"/><circle id="x"/></svg>';
     expect(() => new SvgParser().parse(xml)).toThrow('id already exists: x');

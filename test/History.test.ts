@@ -54,6 +54,14 @@ describe('undo and redo', () => {
     expect(run('undo')).toEqual(['error: nothing to undo']);
   });
 
+  it('saves to the previous path when save has no argument', () => {
+    const path = join(temporary, 'default-path.svg');
+    run('create rect a 0 0 1 1');
+    run(`save ${path}`);
+    run('create rect b 0 0 1 1');
+    expect(run('save')).toEqual([`saved to ${path} (2 elements)`]);
+  });
+
   it('does not block history for a canvas query but does for resize', () => {
     run('create rect a 0 0 1 1');
     expect(run('canvas')).toEqual(['canvas 800x600']);
